@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.misiai.dao.DepartmentMapper">
+    <select id="findById" resultType="com.misiai.bean.Department">
+        select id, dept_name departmentName
+        from department
+        where id = #{id};
+    </select>
+
+
+    <resultMap id="mapFindEmp" type="com.misiai.bean.Department">
+        <id column="did" property="id"/>
+        <result column="departmentName" property="departmentName"/>
+        <collection property="employees" ofType="Employee">
+            <id column="id" property="id"/>
+            <result column="email" property="email"/>
+            <result column="gender" property="gender"/>
+            <result column="lastName" property="lastName"/>
+        </collection>
+    </resultMap>
+    <select id="findEmpsById" resultMap="mapFindEmp">
+        SELECT d.id        did,
+               d.dept_name departmentName,
+               e.id        id,
+               e.email     email,
+               e.gender    gender,
+               e.last_name lastName
+        FROM department d
+                 LEFT JOIN employee e ON d.id = e.dept_id
+        WHERE d.id = #{id};
+    </select>
+    <!---->
+<resultMap id="mapFindEmployeesStep" type="com.misiai.bean.Department">
+    <id column="id" property="id"/>
+    <result column="dept_name" property="departmentName"/>
+
+    <collection property="employees" column="id"  select="com.misiai.dao.EmployeePlusMapper.findEmployeesByDeptId">
+
+    </collection>
+</resultMap>
+    <select id="findEmployeesByIdStep" resultMap="mapFindEmployeesStep">
+        select *
+        from department where id=#{id};
+    </select>
+
+</mapper>

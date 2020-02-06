@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.misiai.dao.EmployeeCacheMapper">
+    <!--cache开启缓存-->
+    <cache type="org.mybatis.caches.ehcache.EhcacheCache" readOnly="false" flushInterval="600000" eviction="FIFO"/>
+    <select id="findById" resultType="employee">
+        select *
+        from employee
+        where id = #{id};
+    </select>
+</mapper>

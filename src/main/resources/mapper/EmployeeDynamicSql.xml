@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.misiai.dao.EmployeeDynamicSql">
+
+    <select id="findByEm" resultType="employee">
+        select *
+        from employee
+        <where>
+
+            <if test="id!=null">
+                id = #{id}
+            </if>
+            <if test="email!=null">
+                and email = #{email}
+            </if>
+            <if test="gender!=null">
+                and gender = #{gender}
+            </if>
+        </where>
+    </select>
+    <select id="findByEmByTrim" resultType="employee">
+        select *
+        from employee
+        <trim prefix="where" suffixOverrides="and">
+            <if test="id!=null">
+                id = #{id} and
+            </if>
+            <if test="email!=null">
+                email = #{email} and
+            </if>
+            <if test="gender!=null">
+                gender = #{gender} and
+            </if>
+        </trim>
+    </select>
+    <select id="findByIdOrEmail" resultType="employee">
+        select *
+        from employee
+        <where>
+            <choose>
+                <when test="id!=null">
+                    id=#{id}
+                </when>
+                <when test="email!=null">
+                    email=#{email}
+                </when>
+                <otherwise>
+                    1=1
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+
+    <update id="updateByAny">
+        update employee
+        <set>
+            <if test="lastName!=null">
+                last_name=#{lastName},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+        </set>
+        where id=#{id}
+
+    </update>
+    <select id="findByForeach" resultType="com.misiai.bean.Employee">
+        select *
+        from employee
+        where id in
+        <foreach collection="list" separator="," open="(" close=")" item="item_id" index="i">
+            #{item_id}
+        </foreach>
+    </select>
+
+    <sql id="commonSql">
+        select *
+        from employee
+    </sql>
+
+    <select id="findByLike" resultType="employee">
+        <bind name="_lastName" value="'%'+lastName+'%'"/>
+        <include refid="commonSql"/>
+        where last_name like #{_lastName};
+    </select>
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+
+<configuration>
+
+    <!--
+    1、mybatis可以使用properties来引入外部properties配置文件的内容；resource：引入类路径下的资源
+    url：引入网络路径或者磁盘路径下的谛源
+    -->
+    <properties resource="jdbc.properties"/>
+
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="cacheEnabled" value="true"/>
+    </settings>
+    <typeAliases>
+        <!--
+        typeAlias：为某个java类型起别名
+        type：指定要起别名的类型全类名；默认别名就是类名小写；employee
+        alias：指定一个新的别名
+        -->
+        <!--
+            然后我们在mapper文件中，诸如resultType，就不用写全com.misiai.bean.Employee，而只需要employee
+        -->
+        <!--<typeAlias type="com.misiai.bean.Employee"/>-->
+
+        <!--
+        package：为某个包下的所有类批量起别名
+        name：指定包名（为当前包以及下面所有的后代包的每一个类都起一个默认别名（类名小写））
+        -->
+        <!--
+        当然，如果该包的子包下有同名的bean类，那么就会报错。
+        这是我们可以使用@Alias("emp")注解来指定新的
+        -->
+        <package name="com.misiai.bean"/>
+    </typeAliases>
+    <!--
+        environments：环境们，mybatis可以配置多种环境，default指定使用某种环境。
+        environment；配置一个具体的环境信息，必须有两个标签；id代表当前环境的唯一标识
+                transactionManager：
+                dataSource：
+    -->
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+
+        </environment>
+    </environments>
+    <mappers>
+        <mapper resource="mapper/EmployeeMapper.xml"/>
+        <mapper resource="mapper/EmployeeCacheMapper.xml"/>
+        <mapper resource="mapper/DepartmentMapper.xml"/>
+        <mapper resource="mapper/EmployeeDynamicSql.xml"/>
+    </mappers>
+</configuration>

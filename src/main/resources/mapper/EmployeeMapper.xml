@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.misiai.dao.EmployeeMapper">
+    <!--namespace：命名空间
+        id：唯一标识
+        resultType：返回值类型
+        #{id}：从传递过来的参数中获取一个值，可理解为以前的占位符。
+    -->
+    <select id="findById" resultType="employee">
+        select * from employee where id=#{id};
+    </select>
+    <select id="findByIdAndLastName" resultType="employee">
+        select * from employee where id=#{id} and last_name=#{lastName};
+    </select>
+    <select id="findByMap" resultType="employee">
+        select * from employee where id=#{id} and last_name=#{lastName};
+    </select>
+    <select id="findAll" resultType="employee">
+        select * from employee;
+    </select>
+    <select id="findResultMapById" resultType="java.util.Map">
+        select * from employee where  id=#{id};
+    </select>
+    <select id="findResultsMap" resultType="employee">
+        select * from employee;
+    </select>
+    <!--
+        useGeneratedKeys="true"；使用自增主键获取主键值策略
+        keyProperty；指定对应的主键属性，也就是mybatis获取到主键值以后，将这个值封装给javaBean的哪个属性
+    -->
+    <insert id="insert" parameterType="com.misiai.bean.Employee" useGeneratedKeys="true" keyProperty="id">
+        insert into employee (last_name, email, gender) values (#{lastName},#{email},#{gender});
+    </insert>
+
+    <update id="update" parameterType="com.misiai.bean.Employee">
+        update employee set last_name=#{lastName},email=#{email},gender=#{gender}
+        where id=#{id}
+    </update>
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from employee where id =#{id}
+    </delete>
+    <!--
+        public Boolean insert(Employee employee);
+
+    public Boolean update(Employee employee);
+
+    public Boolean deleteById(Integer id);
+
+    -->
+</mapper>

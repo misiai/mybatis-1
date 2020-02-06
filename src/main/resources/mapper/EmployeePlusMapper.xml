@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.misiai.dao.EmployeePlusMapper">
+
+    <!--
+    id：方便引用，自定义
+    type：被定义的javaBean
+    -->
+    <resultMap id="employeeResult" type="com.misiai.bean.Employee">
+        <!--
+        <id />标签，专门用来定义主键
+        column：数据库对应的列名
+        property：javaBean中的属性名
+        -->
+        <id column="id" property="id"/>
+        <!--
+            <result/> 标签，定义其他普通列。主键列也可用result定义，但用<id>定义更好。
+        -->
+        <result column="last_name" property="lastName"/>
+        <!--
+        其他列不指定，则默认自动封装，但既然都使用resultMap，那么建议都写上。
+        -->
+        <result column="email" property="email"/>
+        <result column="gender" property="gender"/>
+    </resultMap>
+
+    <resultMap id="EmpAndDept" type="com.misiai.bean.Employee">
+        <id column="id" property="id"/>
+        <result column="email" property="email"/>
+        <result column="gender" property="gender"/>
+        <result column="last_name" property="lastName"/>
+        <!--
+        department.id中的department是在bean类定义的属性名称。
+        -->
+        <!--<result column="did" property="department.id"/>-->
+        <!--<result column="dept_name" property="department.departmentName"/>-->
+        <!--上面两列等效于：-->
+        <association property="department" javaType="com.misiai.bean.Department">
+            <id column="did" property="id"/>
+            <result column="dept_name" property="departmentName"/>
+        </association>
+    </resultMap>
+
+
+
+    <select id="findById" resultMap="employeeResult">
+        select *
+        from employee
+        where id = #{id};
+    </select>
+
+    <select id="findEmpAndDept" resultMap="EmpAndDept">
+        SELECT e.id        id,
+               e.email     email,
+               e.gender    gender,
+               e.last_name last_name,
+               d.id        did,
+               d.dept_name dept_name
+        FROM employee e,
+             department d
+        WHERE e.dept_id = d.id
+          AND e.id = 5
+    </select>
+
+    <!--
+  EmpAndDeptStep
+  使用association进行分步查询：
+  1、先按照员工id查询员工信息
+  2、根据查询员工信息中的d_id值去部门表查出部门信息
+  3、部门设置到员工中；
+  -->
+    <resultMap id="EmpAndDeptStep" type="com.misiai.bean.Employee">
+        <id column="id" property="id"/>
+        <result column="email" property="email"/>
+        <result column="gender" property="gender"/>
+        <result column="last_name" property="lastName"/>
+        <association column="dept_id" property="department" select="com.misiai.dao.DepartmentMapper.findById" >
+            <!--select：表明当前属性是调用select指定的方法查出的结果-->
+            <id column="dept_id" property="id"/>
+            <result column="dept_name" property="departmentName"/>
+        </association>
+    </resultMap>
+    <select id="findEmpAndDeptStep" resultMap="EmpAndDeptStep">
+        select * from employee where id=#{id}
+
+    </select>
+
+    <!--List<Employee> findEmployeesByDeptId(Integer id);-->
+    <select id="findEmployeesByDeptId" resultType="employee">
+        select *
+        from employee where dept_id=#{id};
+    </select>
+
+</mapper>
